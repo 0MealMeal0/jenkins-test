@@ -1,2 +1,2 @@
-# jenkins-test
-For jenkins test directory
+# jenkins-docker-test
+For jenkins docker test
