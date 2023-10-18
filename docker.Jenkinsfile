@@ -79,8 +79,8 @@ pipeline{
                         }
                     }
                     sshagent (credentials: ['tf-key.']){
-                        sh "ssh -o StrictHostKeyChecking=no -i $JENKINS_HOME/tf.pem ubuntu@172.31.27.102"
-                        sh "aws ecr get-login-password --region ap-northeast-2 | \
+                        sh "ssh -o StrictHostKeyChecking=no -i $JENKINS_HOME/tf.pem ubuntu@172.31.27.102 |
+                            aws ecr get-login-password --region ap-northeast-2 | \
                             docker login --username AWS --password-stdin ${env.ECR_URL}; \
                             docker run -d --rm -p  8080:80 --name nginx ${env.ECR_URL}/basketball-ecr:latest"
                         // docker run --rm 옵션으로 container stop 시 해당 container에 대한 모든 정보가 삭제된다.
