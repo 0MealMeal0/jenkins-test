@@ -76,10 +76,16 @@ pipeline{
                         }
                     }
                     sshagent (credentials: ['tf-key.']){
-                        sh " 'ssh -o StrictHostKeyChecking=no -i $JENKINS_HOME/tf.pem ubuntu@172.31.27.102 \
-                            ""aws ecr get-login-password --region ap-northeast-2 | \
-                            docker login --username AWS --password-stdin ${env.ECR_URL}; \
-                            docker run -d --rm -p  8080:80 --name nginx ${env.ECR_URL}/basketball-ecr:latest"" '"
+                         sh 'sshpass -p 1234 ssh ubuntu@172.31.44.9 -o StrictHostKeyChecking=no  \
+                            "docker pull public.ecr.aws/abctest/btcms:latest; \
+                             docker run -d --rm -p 80:80 --name nginx 175321200489.dkr.ecr.ap-northeast-2.amazonaws.com/basketball-ecr:latest"'
+
+
+                        
+                        // sh "ssh -o StrictHostKeyChecking=no -i $JENKINS_HOME/tf.pem ubuntu@172.31.27.102 | \
+                        //     aws ecr get-login-password --region ap-northeast-2 | \
+                        //     docker login --username AWS --password-stdin ${env.ECR_URL}; \
+                        //     docker run -d --rm -p  8080:80 --name nginx ${env.ECR_URL}/basketball-ecr:latest"
                         // docker run --rm 옵션으로 container stop 시 해당 container에 대한 모든 정보가 삭제된다.
                         // --rm 옵션이 없다면 container stop 시 docker ps -a 를 실행하면 stop된 container에 대한 정보가 나온다.
                         // 하지만 --rm 옵션 사용으로 container에 대한 정보가 삭제되기 때문에 docker ps -a 를 실행해도 아무런 결과가 나오지 않는다. 
