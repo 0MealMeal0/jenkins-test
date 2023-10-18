@@ -33,14 +33,14 @@ pipeline{
 
         stage('test run') {
             steps {
-                sh 'docker run -d -p 8080:80 --rm --name p1 p1'
+                sh 'docker run -d -p 80:8080 --rm --name p1 p1'
             }
         }
 
         stage('application test') {
             steps {
                 script {
-                    String status = sh(script: "curl -sLI -w '%{http_code}' localhost -o /dev/null", returnStdout: true)
+                    String status = sh(script: "curl -sLI -w '%{http_code}' localhost:8080 -o /dev/null", returnStdout: true)
                         if (status != '200' && status != '201') {
                             error("returned status code = $status when calling test")
                         }
@@ -63,9 +63,9 @@ pipeline{
         stage('push to ecr') {
             steps {
                 script {
-                    sh 'aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${env.ecr-url}'
-                    sh 'docker image tag p1:latest ${env.ecr-url}/basketball-ecr:latest'
-                    sh 'docker push ${env.ecr-url}/basketball-ecr:latest'
+                    sh 'aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${env.ecr_url}'
+                    sh 'docker image tag p1:latest ${env.ecr_url}/basketball-ecr:latest'
+                    sh 'docker push ${env.ecr_url}/basketball-ecr:latest'
                     
                 }
             }
@@ -81,8 +81,8 @@ pipeline{
                     }
                     sshagent (credentials: ['tf-key.']){
                         sh 'ssh -o StrictHostKeyChecking=no -i $JENKINS_HOME/tf.pem ubuntu@172.31.47.220 "aws ecr get-login-password --region ap-northeast-2 | \
-                        docker login --username AWS --password-stdin ${env.ecr-url}; \
-                        docker run -d --rm -p  8080:80 --name nginx ${env.ecr-url}/basketball-ecr:latest"'
+                        docker login --username AWS --password-stdin ${env.ecr_url}; \
+                        docker run -d --rm -p  80:8080 --name nginx ${env.ecr_url}/basketball-ecr:latest"'
                         // docker run --rm 옵션으로 container stop 시 해당 container에 대한 모든 정보가 삭제된다.
                         // --rm 옵션이 없다면 container stop 시 docker ps -a 를 실행하면 stop된 container에 대한 정보가 나온다.
                         // 하지만 --rm 옵션 사용으로 container에 대한 정보가 삭제되기 때문에 docker ps -a 를 실행해도 아무런 결과가 나오지 않는다. 
