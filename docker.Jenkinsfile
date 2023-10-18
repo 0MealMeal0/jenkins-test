@@ -77,7 +77,7 @@ pipeline{
                     }
                     sshagent (credentials: ['tf-key.']){
                          sh 'ssh -o StrictHostKeyChecking=no -i $JENKINS_HOME/tf.pem ubuntu@172.31.27.102  \
-                            "docker login --username AWS --password-stdin 175321200489.dkr.ecr.ap-northeast-2.amazonaws.com/basketball-ecr:latest; \
+                            "docker login --username AWS --password-stdin 175321200489.dkr.ecr.ap-northeast-2.amazonaws.com; \
                              docker run -d --rm -p 80:80 --name nginx 175321200489.dkr.ecr.ap-northeast-2.amazonaws.com/basketball-ecr:latest"'
 
 
