@@ -8,6 +8,7 @@ pipeline{
             steps{
                 git branch: 'docker', credentialsId: 'github-token', url: 'https://github.com/0MealMeal0/jenkins-test.git'
                 // docker 브랜치에서 clone한다.
+                sh 'echo ${env.ECR_URL}'
             }
         }
         
@@ -20,7 +21,7 @@ pipeline{
                     // container가 80포트가 할당 된 상태에서 또 할당을 하려고 하니 포트 중복 에러가 생겼다.
                     // Bind for 0.0.0.0:80 failed: port is already allocated.
                     // 그래서 이미 생성된 container를 지우고 build를 진행한다.
-                    sh 'docker rmi -f $(docker images -q) '
+                    sh 'docker rmi -f $(docker images -q)'
                     // 빌드를 하게 되면 이미지들이 계속 쌓여가는 현상이 나타났다.
                     // 그래서 모든 이미지를 지운 후 build를 진행해 용량을 확보한다. 
                 }
@@ -66,7 +67,6 @@ pipeline{
                     sh 'aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${env.ECR_URL}'
                     sh 'docker image tag p1:latest ${env.ECR_URL}/basketball-ecr:latest'
                     sh 'docker push ${env.ECR_URL}/basketball-ecr:latest'
-                    
                 }
             }
         }
