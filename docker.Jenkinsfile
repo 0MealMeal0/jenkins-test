@@ -8,7 +8,6 @@ pipeline{
             steps{
                 git branch: 'docker', credentialsId: 'github-token', url: 'https://github.com/0MealMeal0/jenkins-test.git'
                 // docker 브랜치에서 clone한다.
-                sh 'echo ${env.ECR_URL}'
             }
         }
         
@@ -64,9 +63,9 @@ pipeline{
         stage('push to ecr') {
             steps {
                 script {
-                    sh 'aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${env.ECR_URL}'
-                    sh 'docker image tag p1:latest ${env.ECR_URL}/basketball-ecr:latest'
-                    sh 'docker push ${env.ECR_URL}/basketball-ecr:latest'
+                    sh "aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin ${env.ECR_URL}"
+                    sh "docker image tag p1:latest ${env.ECR_URL}/basketball-ecr:latest"
+                    sh "docker push ${env.ECR_URL}/basketball-ecr:latest"
                 }
             }
         }
@@ -80,9 +79,10 @@ pipeline{
                         }
                     }
                     sshagent (credentials: ['tf-key.']){
-                        sh 'ssh -o StrictHostKeyChecking=no -i $JENKINS_HOME/tf.pem ubuntu@172.31.47.220 "aws ecr get-login-password --region ap-northeast-2 | \
-                        docker login --username AWS --password-stdin ${env.ECR_URL}; \
-                        docker run -d --rm -p  8080:80 --name nginx ${env.ECR_URL}/basketball-ecr:latest"'
+                        sh "ssh -o StrictHostKeyChecking=no -i $JENKINS_HOME/tf.pem ubuntu@172.31.47.220"
+                        sh "aws ecr get-login-password --region ap-northeast-2 | \
+                            docker login --username AWS --password-stdin ${env.ECR_URL}; \
+                            docker run -d --rm -p  8080:80 --name nginx ${env.ECR_URL}/basketball-ecr:latest"
                         // docker run --rm 옵션으로 container stop 시 해당 container에 대한 모든 정보가 삭제된다.
                         // --rm 옵션이 없다면 container stop 시 docker ps -a 를 실행하면 stop된 container에 대한 정보가 나온다.
                         // 하지만 --rm 옵션 사용으로 container에 대한 정보가 삭제되기 때문에 docker ps -a 를 실행해도 아무런 결과가 나오지 않는다. 
