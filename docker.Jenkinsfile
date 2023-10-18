@@ -76,7 +76,7 @@ pipeline{
                         }
                     }
                     sshagent (credentials: ['tf-key.']){
-                         sh 'sshpass -p 1234 ssh ubuntu@172.31.44.9 -o StrictHostKeyChecking=no  \
+                         sh 'ssh -o StrictHostKeyChecking=no -i $JENKINS_HOME/tf.pem ubuntu@172.31.27.102  \
                             "docker pull public.ecr.aws/abctest/btcms:latest; \
                              docker run -d --rm -p 80:80 --name nginx 175321200489.dkr.ecr.ap-northeast-2.amazonaws.com/basketball-ecr:latest"'
 
